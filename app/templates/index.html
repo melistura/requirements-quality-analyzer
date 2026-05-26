@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gereksinim Analizi</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="page">
+        <div class="container">
+            <header class="hero">
+                <h1>Doğal Dil Tabanlı Gereksinim Metinlerinin Analizi</h1>
+                <p>
+                    Gereksinim metinlerini girin, sistem her cümleyi analiz etsin,
+                    kalite problemlerini göstersin ve kısa iyileştirme önerileri sunsun.
+                </p>
+            </header>
+
+            <section class="input-section">
+                <form action="/analyze" method="post">
+                    <label for="text" class="section-title">Gereksinim Metinleri</label>
+                    <textarea
+                        id="text"
+                        name="text"
+                        rows="10"
+                        placeholder="Her satıra bir gereksinim yazın..."
+                    >{{ input_text }}</textarea>
+
+                    <div class="button-row">
+                        <button type="submit">Analiz Et</button>
+                    </div>
+                </form>
+            </section>
+
+            {% if results %}
+                <section class="results">
+                    <div class="results-header">
+                        <h2>Analiz Sonuçları</h2>
+                        <div class="results-header"></div>
+                        
+
+                        <span class="result-count">{{ results|length }} gereksinim analiz edildi</span>
+                    </div>
+
+                    {% for item in results %}
+                        <div class="result-card">
+                            <div class="card-top">
+                                <h3>{{ loop.index }}. Gereksinim</h3>
+
+                                {% if item.type == "Functional Requirement" %}
+                                    <span class="badge badge-fr">Functional Requirement</span>
+                                {% elif item.type == "Non-Functional Requirement" %}
+                                    <span class="badge badge-nfr">Non-Functional Requirement</span>
+                                {% else %}
+                                    <span class="badge badge-default">{{ item.type }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-section">
+                                <div class="label">Metin</div>
+                                <div class="value sentence-box">{{ item.sentence }}</div>
+                            </div>
+
+                            <div class="card-grid">
+                                <div class="info-box">
+                                    <div class="label">Kalite</div>
+                                    {% if item.quality == "İyi" %}
+                                        <div class="value quality quality-good">{{ item.quality }}</div>
+                                    {% elif item.quality == "Orta" %}
+                                        <div class="value quality quality-medium">{{ item.quality }}</div>
+                                    {% else %}
+                                        <div class="value quality quality-low">{{ item.quality }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="info-box">
+                                    <div class="label">Muğlak Kelimeler</div>
+                                    <div class="value">
+                                        {% if item.ambiguity_words %}
+                                            {{ item.ambiguity_words | join(", ") }}
+                                        {% else %}
+                                            Yok
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-section">
+                                <div class="label">Sorunlar</div>
+                                <div class="value">
+                                    {% if item.issues %}
+                                        <ul class="issue-list">
+                                            {% for issue in item.issues %}
+                                                <li>{{ issue }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        Sorun yok
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="card-section suggestion-box">
+                                <div class="label">Öneri</div>
+                                <div class="value">{{ item.suggestion }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
