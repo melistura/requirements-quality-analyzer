@@ -278,3 +278,30 @@ button:hover {
         grid-template-columns: 1fr;
     }
 }
+/* ===== Özet istatistik kutuları (yeni eklendi) ===== */
+.summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0 24px;
+}
+.summary-box {
+    flex: 1 1 120px;
+    background: #f5f7fb;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+}
+.summary-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1f3b73;
+}
+.summary-label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}

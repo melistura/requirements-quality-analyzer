@@ -1,5 +1,6 @@
 import re
 
+
 def split_sentences(text: str):
     # Önce tüm metni normalize edelim
     text = text.strip()
@@ -11,6 +12,7 @@ def split_sentences(text: str):
     sentences = [s.strip() for s in sentences if s.strip()]
 
     return sentences
+
 
 def classify_requirement(sentence: str):
     sentence_lower = sentence.lower()
@@ -50,9 +52,8 @@ def classify_requirement(sentence: str):
         "privacy",
         "maintainable",
         "maintainability",
-        "availability",
         "fault tolerant",
-        "interoperability"
+        "interoperability",
     ]
 
     constraint_keywords = [
@@ -78,7 +79,7 @@ def classify_requirement(sentence: str):
         "yalnızca",
         "sadece",
         "en az",
-        "en fazla"
+        "en fazla",
     ]
 
     fr_keywords = [
@@ -98,7 +99,6 @@ def classify_requirement(sentence: str):
         "hesapla",
         "doğrula",
         "gönder",
-        "al",
         "kaydet",
         "giriş yapabil",
         "çıkış yapabil",
@@ -119,13 +119,14 @@ def classify_requirement(sentence: str):
         "can upload",
         "can download",
         "can search",
-        "can filter"
+        "can filter",
     ]
 
     nfr_score = sum(1 for keyword in nfr_keywords if keyword in sentence_lower)
     constraint_score = sum(1 for keyword in constraint_keywords if keyword in sentence_lower)
     fr_score = sum(1 for keyword in fr_keywords if keyword in sentence_lower)
 
+    # Bu çalışmada kısıt ifadeleri fonksiyonel olmayan gereksinim kapsamında değerlendirilir.
     if constraint_score > 0:
         return "Non-Functional Requirement"
 
@@ -133,11 +134,10 @@ def classify_requirement(sentence: str):
         return "Non-Functional Requirement"
 
     if fr_score > 0:
-     return "Functional Requirement"
+        return "Functional Requirement"
 
+    # Hiçbir anahtar kelime eşleşmezse varsayılan olarak fonksiyonel gereksinim kabul edilir.
     return "Functional Requirement"
-
-
 
 
 def detect_ambiguity(sentence: str):
@@ -170,19 +170,25 @@ def detect_ambiguity(sentence: str):
         "efficient",
         "appropriate",
         "good",
-        "optimal",
-        "robust"
+        "robust",
     ]
 
-    found_words = [word for word in ambiguity_words if word in sentence.lower()]
+    sentence_lower = sentence.lower()
+    found_words = [word for word in ambiguity_words if word in sentence_lower]
     return found_words
+
+
+# Kalite seviyelerinin sayısal karşılıkları (ortalama puan hesabı için kullanılır)
+QUALITY_SCORES = {
+    "İyi": 100,
+    "Orta": 65,
+    "Düşük": 35,
+}
 
 
 def evaluate_quality(sentence: str, ambiguity_words: list):
     issues = []
     suggestions = []
-
-    
 
     if ambiguity_words:
         issues.append("Muğlak ifade içeriyor.")
@@ -192,7 +198,9 @@ def evaluate_quality(sentence: str, ambiguity_words: list):
         issues.append("Cümle çok kısa olabilir.")
         suggestions.append("Gereksinim daha açıklayıcı biçimde yazılabilir.")
 
-    if "ve" in sentence.lower() and len(sentence.split()) > 8:
+    # "ve" bağlacını yalnızca ayrı bir kelime olarak ara (örn. "veri", "güvenli"
+    # gibi kelimelerin içindeki "ve" hece dizisi yanlış eşleşmeye yol açmasın).
+    if re.search(r"\bve\b", sentence.lower()) and len(sentence.split()) > 8:
         issues.append("Birden fazla gereksinim tek cümlede ifade edilmiş olabilir.")
         suggestions.append("Gereksinimler ayrı cümlelere bölünebilir.")
 
@@ -206,7 +214,8 @@ def evaluate_quality(sentence: str, ambiguity_words: list):
         quality = "Düşük"
         suggestion = " ; ".join(suggestions)
 
-    return quality, issues, suggestion
+    quality_score = QUALITY_SCORES[quality]
+    return quality, issues, suggestion, quality_score
 
 
 def analyze_requirements(text: str):
@@ -216,7 +225,7 @@ def analyze_requirements(text: str):
     for sentence in sentences:
         req_type = classify_requirement(sentence)
         ambiguity_words = detect_ambiguity(sentence)
-        quality, issues, suggestion = evaluate_quality(sentence, ambiguity_words)
+        quality, issues, suggestion, quality_score = evaluate_quality(sentence, ambiguity_words)
 
         results.append(
             {
@@ -224,6 +233,7 @@ def analyze_requirements(text: str):
                 "type": req_type,
                 "ambiguity_words": ambiguity_words,
                 "quality": quality,
+                "quality_score": quality_score,
                 "issues": issues,
                 "suggestion": suggestion,
             }

@@ -37,10 +37,26 @@
                 <section class="results">
                     <div class="results-header">
                         <h2>Analiz Sonuçları</h2>
-                        <div class="results-header"></div>
-                        
-
                         <span class="result-count">{{ results|length }} gereksinim analiz edildi</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <div class="summary-box">
+                            <div class="summary-value">{{ total_requirements }}</div>
+                            <div class="summary-label">Toplam Gereksinim</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-value">{{ fr_count }}</div>
+                            <div class="summary-label">Fonksiyonel</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-value">{{ nfr_count }}</div>
+                            <div class="summary-label">Fonksiyonel Olmayan</div>
+                        </div>
+                        <div class="summary-box">
+                            <div class="summary-value">{{ average_score }}</div>
+                            <div class="summary-label">Ortalama Kalite Puanı</div>
+                        </div>
                     </div>
 
                     {% for item in results %}
